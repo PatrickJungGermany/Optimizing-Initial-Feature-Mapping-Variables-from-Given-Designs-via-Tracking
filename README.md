@@ -1,4 +1,4 @@
-# Optimizing-Initial-Feature-Mapping-Variables-from-Given-Designs-via-Tracking
+# Optimizing-initial-feature-mapping-variables-from-given-designs-via-tracking
 A modular and fully differentiable Python framework for reconstructing 
 density-based topology optimization results using parametric capsule features.
 
