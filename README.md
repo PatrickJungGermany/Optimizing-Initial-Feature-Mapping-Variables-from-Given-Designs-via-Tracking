@@ -93,4 +93,6 @@ paju_99@web.de
 
 Note: The generation of density XML files requires an external CFS solver.
 The reconstruction framework itself operates on existing density files.
+IPOPT must be installed separately on your system before installing cyipopt.
+
 
