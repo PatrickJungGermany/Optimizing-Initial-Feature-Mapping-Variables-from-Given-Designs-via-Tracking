@@ -57,3 +57,40 @@ python scripts/optimize.py \
     density/files/5bar_80.density.xml \
     opt_config/example_run.json \
     --output_dir ./example_run
+
+
+## Workflow
+
+1. Generate a target density field using CFS:
+   - Create mesh
+   - Define physical configuration
+   - Run CFS solver
+   - Obtain .density.xml file
+
+2. Run the feature-based reconstruction:
+   - Load density field
+   - Initialize features
+   - Execute staged optimization
+   - Apply pruning / merging / refinement
+
+
+## Technical Highlights
+
+- Analytical signed distance functions
+- Exact first and second derivatives
+- Smooth aggregation (p-norm / softmax)
+- Constraint-safe nonlinear optimization
+- Exact Hessian support (IPOPT)
+- Multi-stage reconstruction strategy
+- Automated feature pruning and merging
+
+
+## Contact
+
+Patrick Jung  
+paju_99@web.de
+
+
+Note: The generation of density XML files requires an external CFS solver.
+The reconstruction framework itself operates on existing density files.
+
