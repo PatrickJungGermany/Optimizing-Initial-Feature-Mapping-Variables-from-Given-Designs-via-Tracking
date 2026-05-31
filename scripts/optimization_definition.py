@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import pill as sp 
+import feature_definition as sp 
 import os
 
 
@@ -644,3 +644,65 @@ class FeatureOptimizationProblemConstraints:
             return np.array([], dtype=np.float64)
         jac = self.constraint_obj.jacobian(s)
         return jac.flatten(order="C")  
+    
+  
+
+
+
+class NewtonOptimizer:
+    def __init__(self, problem, c1=1e-4, c2=0.9, tol=1e-6, max_iter=100):
+        self.problem = problem
+        self.c1 = c1
+        self.c2 = c2
+        self.tol = tol
+        self.max_iter = max_iter
+
+    def optimize(self, s0):
+        s = s0.copy()
+        for k in range(self.max_iter):
+            f = self.problem.objective(s)
+            grad = self.problem.gradient(s)
+            H = self._build_hessian_matrix(s)
+
+            if np.linalg.norm(grad) < self.tol:
+                print(f"Konvergenz erreicht nach {k} Iterationen.")
+                break
+
+            # Newton-Schritt: -H^-1 * grad
+            try:
+                p = -np.linalg.solve(H, grad)
+            except np.linalg.LinAlgError:
+                print("Hesse-Matrix nicht invertierbar.")
+                break
+
+            # Line Search mit Wolfe-Bedingung
+            alpha = self._line_search_wolfe(s, p, f, grad)
+            s = s + alpha * p
+            print("new s")
+            print(s)
+
+        return s
+
+    def _build_hessian_matrix(self, s):
+        rows, cols = np.tril_indices(self.problem.num_vars)
+        hess_vals = self.problem.hessian(s, lagrange=[], obj_factor=1.0)
+        H = np.zeros((self.problem.num_vars, self.problem.num_vars))
+        H[rows, cols] = hess_vals
+        H[cols, rows] = hess_vals  # Symmetrie ausnutzen
+        return H
+
+    def _line_search_wolfe(self, s, p, f, grad):
+        alpha = 1.0
+        max_ls_iter = 20
+        for _ in range(max_ls_iter):
+            s_new = s + alpha * p
+            f_new = self.problem.objective(s_new)
+            grad_new = self.problem.gradient(s_new)
+
+            armijo = f_new <= f + self.c1 * alpha * np.dot(grad, p)
+            curvature = np.dot(grad_new, p) >= self.c2 * np.dot(grad, p)
+
+            if armijo and curvature:
+                return alpha
+            alpha *= 0.5  # Schrittweite halbieren
+        return alpha  # Gibt letztes Alpha zurück, selbst wenn Wolfe nicht erfüllt
