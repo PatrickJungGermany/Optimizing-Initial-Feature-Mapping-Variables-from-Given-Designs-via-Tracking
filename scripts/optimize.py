@@ -1,15 +1,15 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import pill as sp 
+import feature_definition as sp 
 import os
 import json
 from typing import Optional
-from scypy_optimize import FeatureOptimizationProblemConstraints
+from optimization_definition import FeatureOptimizationProblemConstraints
 import sys
 import time
-from scypy_optimize import SegmentLengthConstraint
-from scypy_optimize import CombinedConstraints
-from newton_optimization import NewtonOptimizer
+from optimization_definition import SegmentLengthConstraint
+from optimization_definition import CombinedConstraints
+from optimization_definition import NewtonOptimizer
 import cyipopt
 import imageio.v2 as imageio
 import subprocess
@@ -19,9 +19,9 @@ from scipy.optimize import minimize
 import copy
 import argparse
 from skimage.transform import resize
-from pill import glob
+from feature_definition import glob
 from scipy.optimize import minimize, Bounds, NonlinearConstraint
-from scypy_optimize import SegmentMaxLengthConstraint
+from optimization_definition import SegmentMaxLengthConstraint
 import math 
 from PIL import Image
 
@@ -2329,7 +2329,6 @@ def run_configured_optimization(density_path: str, config: dict, output_dir: str
 
 
 
-
 def parse_args():
     """
     CLI parser for the main entrypoint.
@@ -2369,3 +2368,5 @@ def run_cfs(mesh_file, config_file, output_file):
     command = ["cfs", "-m", mesh_path, "-p", config_path, output_file]
     subprocess.run(command, check=True)
 
+if __name__ == "__main__":
+    main()
