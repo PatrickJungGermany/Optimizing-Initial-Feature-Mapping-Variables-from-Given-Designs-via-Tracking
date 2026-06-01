@@ -1,6 +1,6 @@
 {
   "start_strategy": "cross",
-  "num_features": 8,
+  "num_features": 2,
   "start_radius": 0.05,
   "random_seed": 11,
   "global": {
@@ -37,6 +37,7 @@
       "p": 7,
       "beta": 6,
       "extension": 0.2,
+      "plot": false,
       "make_gif": false,
       "smaller_box": true
     }
@@ -54,6 +55,7 @@
       "p": 9,
       "beta": 12,
       "extension": 0.1,
+      "plot": true,
       "make_gif": false
     },
     {
@@ -68,6 +70,7 @@
       "p": 9,
       "beta": 12,
       "extension": 0.0,
+      "plot": ["objective","derivative"],
       "make_gif": false
     }
   ],
@@ -75,13 +78,13 @@
     "enable_merge": false,
     "ARmin": 0.005,
     "URmin": 0.012,
-    "theta_lim_deg": 10.0,
+    "theta_lim_deg": 3.0,
     "min_dist": 0.15,
     "use_segment_distance": false
   },
   "additive": {
     "enable": false,
-    "max_additions": 10,
+    "max_additions": 3,
     "residual_threshold": 0.5,
     "seed_radius": 0.05,
     "fixed_r": 0.05,
@@ -90,12 +93,13 @@
     "improve_min_abs": 0.0,
     "orientation_stage": {
       "optimizer": "ipopt",
-      "max_iter": 100,
+      "max_iter": 50,
       "tolerance": 1e-6,
       "combine": "p-norm",
       "p": 9,
       "beta": 18,
       "extension": 1.4,
+      "plot": false,
       "make_gif": false
     },
     "convergence_relevant": {
@@ -106,17 +110,19 @@
       "p": 9,
       "beta": 12,
       "extension": 0.1,
+      "plot": false,
       "make_gif": false
     },
     "convergence_combined": {
       "optimizer": "ipopt",
-      "max_iter": 100,
+      "max_iter": 50,
       "transition": 0.05,
       "tolerance": 1e-7,
       "combine": "p-norm",
       "p": 9,
       "beta": 12,
       "extension": 0.0,
+      "plot": false,
       "make_gif": false
     }
   }
