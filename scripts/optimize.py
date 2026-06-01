@@ -847,6 +847,8 @@ def run_optimization_stage(s0, S_star, stage_config,inactive_idx = None, stage_i
         Target density; reshaped internally as needed.
     stage_config : dict
         Keys like 'optimizer', 'max_iter', 'tolerance', 'reward_only', 'constraints', etc.
+        Optional ``plot``: bool or list passed to ``FeatureOptimizationProblemConstraints``
+        (default True: objective frames; False or [] disables in-callback plotting).
     inactive_idx : array_like[int] or None
         Indices to freeze.
     stage_id : int | str
@@ -897,6 +899,7 @@ def run_optimization_stage(s0, S_star, stage_config,inactive_idx = None, stage_i
     check_derivatives = stage_config.get("check_derivatives", False)
     use_first_derivative = stage_config.get("use_first_derivative",False)
     smaller_box = stage_config.get("smaller_box",False)
+    plot_cfg = stage_config.get("plot", True)
     log(f" Starte Optimierungsstufe {stage_id} ({optimizer_type}), Iterationen: {n_iterations}", level="info")
 
     if use_constraints:
@@ -910,7 +913,7 @@ def run_optimization_stage(s0, S_star, stage_config,inactive_idx = None, stage_i
         num_vars=num_vars,
         S_Star=S_star,
         constraint_obj=combined_constraint,
-        plot=True,
+        plot=plot_cfg,
         frame_dir=frame_dir,
         reward_only=reward_only
     )
