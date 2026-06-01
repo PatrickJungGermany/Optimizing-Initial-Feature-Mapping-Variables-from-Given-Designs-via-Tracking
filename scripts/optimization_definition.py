@@ -478,9 +478,8 @@ class FeatureOptimizationProblemConstraints:
         if self.reward_only:
             grad = -np.dot(grad_matrix, self.S_Star.flatten(order='F'))
         elif self.reward_only2:
-            rho = sp.dichte(s).flatten(order='F') 
+            rho = S
             f_prime = np.where(rho < 1.0, 1.0, 0.0)
-            grad_matrix = sp.ableitung(s).reshape((self.num_vars, self.n_points), order='C')
             grad = -np.dot(grad_matrix, f_prime)
         else:
             residual = self.S_Star.flatten(order='F') - S
@@ -507,8 +506,9 @@ class FeatureOptimizationProblemConstraints:
         """
         self.s = s.copy()
         grad_matrix = sp.ableitung(s).reshape((self.num_vars, self.nx, self.ny))
-        hess_tensor = sp.hessian(s).reshape((self.num_vars, self.num_vars, self.nx, self.ny))
-        H4 = sp.hessian(s).reshape((self.num_vars, self.num_vars, self.nx, self.ny))
+        H_raw = sp.hessian(s).reshape((self.num_vars, self.num_vars, self.nx, self.ny))
+        hess_tensor = H_raw
+        H4 = H_raw
 
         H_total = np.zeros((self.num_vars, self.num_vars))
         if self.reward_only:
