@@ -867,7 +867,7 @@ def run_optimization_stage(s0, S_star, stage_config,inactive_idx = None, stage_i
         inactive_idx = np.array(inactive_idx, dtype=int)
         inactive_idx = inactive_idx[(inactive_idx >= 0) & (inactive_idx < len(s0))]
         inactive_idx = np.unique(inactive_idx)
-    for key in ["transition", "extension","extension_kind", "boundary", "N", "k", "combine", "p", "n", "bounds", "beta"]:
+    for key in ["transition", "extension", "boundary", "N", "k", "combine", "p", "n", "bounds", "beta"]:
         if key in stage_config:
             setattr(sp.glob, key, stage_config[key])
     if "n" in stage_config:
