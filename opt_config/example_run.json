@@ -4,7 +4,7 @@
   "start_radius": 0.05,
   "random_seed": 11,
   "global": {
-    "boundary": "smoothstep",
+    "boundary": "smoothstep_extended",
     "transition": 0.1,
     "n": [80, 40],
     "p": 9,
