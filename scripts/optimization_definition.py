@@ -478,8 +478,9 @@ class FeatureOptimizationProblemConstraints:
         if self.reward_only:
             grad = -np.dot(grad_matrix, self.S_Star.flatten(order='F'))
         elif self.reward_only2:
-            rho = S
+            rho = sp.dichte(s).flatten(order='F') 
             f_prime = np.where(rho < 1.0, 1.0, 0.0)
+            grad_matrix = sp.ableitung(s).reshape((self.num_vars, self.n_points), order='C')
             grad = -np.dot(grad_matrix, f_prime)
         else:
             residual = self.S_Star.flatten(order='F') - S
@@ -506,13 +507,13 @@ class FeatureOptimizationProblemConstraints:
         """
         self.s = s.copy()
         grad_matrix = sp.ableitung(s).reshape((self.num_vars, self.nx, self.ny))
-        H_raw = sp.hessian(s).reshape((self.num_vars, self.num_vars, self.nx, self.ny))
-        hess_tensor = H_raw
-        H4 = H_raw
+        # feature_definition.hessian: shape (num_vars, num_vars, ny, nx); same cell order as
+        # dichte / S_Star with flatten(order='F'). Do not reshape to (nx, ny) — that permutes cells.
+        hess_raw = np.asarray(sp.hessian(s), dtype=np.float64)
 
         H_total = np.zeros((self.num_vars, self.num_vars))
         if self.reward_only:
-            Hsym = 0.5 * (H4 + H4.swapaxes(0, 1))
+            Hsym = 0.5 * (hess_raw + hess_raw.swapaxes(0, 1))
             Hsym_flat = Hsym.reshape(self.num_vars, self.num_vars, self.nx * self.ny, order='F')
             w = self.S_Star.flatten(order='F').astype(np.float64)
             H_total = -np.einsum('abk,k->ab', Hsym_flat, w)
@@ -521,18 +522,20 @@ class FeatureOptimizationProblemConstraints:
             rho = sp.dichte(s).flatten(order='F')
             rho_sum = np.sum(rho)
             denom = max(rho_sum, 1.0)
+            # Linear cell index k matches rho.flatten(order='F') and hess_raw[..., j, i].flatten('F').
+            grad_flat = grad_matrix.reshape((self.num_vars, self.n_points), order='C')
             H_total = np.zeros((self.num_vars, self.num_vars))
             for i in range(self.num_vars):
                 for j in range(i + 1):
                     d2f_ij = 0.0
                     for k in range(self.n_points):
                         rho_k = rho[k]
-                        d_rho_i = grad_matrix[i, k]
-                        d_rho_j = grad_matrix[j, k]
-                        d2_rho_ij = hess_tensor[i, j].flatten(order='F')[k]
+                        d_rho_i = grad_flat[i, k]
+                        d_rho_j = grad_flat[j, k]
+                        d2_rho_ij = hess_raw[i, j].flatten(order='F')[k]
                         d_rho_sum_i = np.sum(grad_matrix[i])
                         d_rho_sum_j = np.sum(grad_matrix[j])
-                        d2_rho_sum_ij = np.sum(hess_tensor[i, j])
+                        d2_rho_sum_ij = np.sum(hess_raw[i, j])
 
                         term1 = d2_rho_ij / denom
                         term2 = (d_rho_sum_i * d_rho_j + d_rho_sum_j * d_rho_i) / (denom**2)
@@ -549,7 +552,7 @@ class FeatureOptimizationProblemConstraints:
                 for j in range(i + 1):
                     dS_di = grad_matrix[i]
                     dS_dj = grad_matrix[j]
-                    d2S_didj = hess_tensor[i, j].flatten(order='F')
+                    d2S_didj = hess_raw[i, j].flatten(order='F')
                     first_term = np.sum(dS_di * dS_dj)
                     second_term = np.sum(error * d2S_didj)
                     H_total[i, j] = 2 * (first_term - second_term)
